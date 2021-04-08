@@ -103,6 +103,7 @@ def init():
                     p_return2 = poisson_dict[return2 + RETURN2 * MAX_CAR]
             
                 p_2[s2, return2 - rent2 + s2] += p_rent2 * p_return2
+    
     print(f"Initialization Done! Time: {time.time() - st:.1f}")
 
 
@@ -118,9 +119,7 @@ def calculate_value(s1, s2, mv, v_old):
 
 def policy_evaluation(v_old, policy):
     iteration = 1
-    st_total = time.time()
     while True:
-        st = time.time()
         delta = 0.0
         v_new = np.zeros((MAX_CAR + 1, MAX_CAR + 1))
         for s1 in range(0, MAX_CAR + 1):
