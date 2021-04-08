@@ -1,13 +1,3 @@
-'''
-discount factor = 0.9
-두 location에 있을 수 있는 차 개수 = state = 0, 1, ..., 20
-1에서 2로 move한 차 개수 = -5, -4, ..., 4, 5
-  (단, 움직인 후 두 lcoation에 있는 차 개수가 0 미만 또는 20 초과면 안됨)
-rent된 차 개수 = min(rent request, state + move)
-  (rent 후에도 차 개수가 0과 20 사이에 있기 위함)
-return된 차 개수 = min (return request, 20 - (state + move - request))
-  (return 후에도 차 개수가 0과 20 사이에 있기 위함)
-'''
 MAX_CAR = 20
 MAX_MOVE = 5
 REWARD_RENTAL = 10.0
@@ -26,7 +16,7 @@ THETA = 0.01
 import numpy as np
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
-import time, sys, os
+import time
 
 
 def plot(nparray, title='', path='plot.png'):
@@ -40,22 +30,11 @@ def plot(nparray, title='', path='plot.png'):
     plt.clf()
 
 
-poisson_dict = dict()
-states = list()
-
-
 def init_poisson_dict(poisson_dict):
     for mu in set((RENT1, RENT2, RETURN1, RETURN2)):
         for i in range(MAX_CAR + 1):
-            poisson_dict[mu * MAX_CAR + i] = poisson.pmf(i, mu)
-
-def poisson_sf(poisson_dict, n, mu):
-    try:
-        v = poisson_dict[mu * MAX_CAR * 10 + n]
-    except KeyError:
-        v = poisson.sf(n, mu)   # sf = 1 - cdf
-        poisson_dict[mu * MAX_CAR * 10 + n] = v
-    return v
+            poisson_dict[i + mu * MAX_CAR] = poisson.pmf(i, mu)
+            poisson_dict[i + mu * MAX_CAR * MAX_CAR ] = poisson.sf(i - 1, mu)
 
 
 def init():
@@ -69,25 +48,25 @@ def init():
             reward_rental_ = 0.
             for rent1 in range(0, s1 + 1):
                 if rent1 == s1:
-                    p_rent1 = poisson_sf(poisson_dict, rent1 - 1, RENT1)
+                    p_rent1 = poisson_dict[rent1 + RENT1 * MAX_CAR * MAX_CAR]
                 else:
                     p_rent1 = poisson_dict[rent1 + RENT1 * MAX_CAR]
 
                 for rent2 in range(0, s2 + 1):
                     if rent2 == s2:
-                        p_rent2 = poisson_sf(poisson_dict, rent2 - 1, RENT2)
+                        p_rent2 = poisson_dict[rent2 + RENT2 * MAX_CAR * MAX_CAR]
                     else:
                         p_rent2 = poisson_dict[rent2 + RENT2 * MAX_CAR]
 
                     for return1 in range(0, MAX_CAR - (s1 - rent1) + 1):
                         if return1 == MAX_CAR - (s1 - rent1):
-                            p_return1 = poisson_sf(poisson_dict, return1 - 1, RETURN1)
+                            p_return1 = poisson_dict[return1 + RETURN1 * MAX_CAR * MAX_CAR]
                         else:
                             p_return1 = poisson_dict[return1 + RETURN1 * MAX_CAR]
                         
                         for return2 in range(0, MAX_CAR - (s2 - rent2) + 1):
                             if return2 == MAX_CAR - (s2 - rent2):
-                                p_return2 = poisson_sf(poisson_dict, return2 - 1, RETURN2)
+                                p_return2 = poisson_dict[return2 + RETURN2 * MAX_CAR * MAX_CAR]
                             else:
                                 p_return2 = poisson_dict[return2 + RETURN2 * MAX_CAR]
                             p = p_rent1 * p_return1 * p_rent2 * p_return2
@@ -98,13 +77,13 @@ def init():
     for s1 in range(0, MAX_CAR + 1):
         for rent1 in range(0, s1 + 1):
             if rent1 == s1:
-                p_rent1 = poisson_sf(poisson_dict, rent1 - 1, RENT1)
+                p_rent1 = poisson_dict[rent1 + RENT1 * MAX_CAR * MAX_CAR]
             else:
                 p_rent1 = poisson_dict[rent1 + RENT1 * MAX_CAR]
             
             for return1 in range(0, MAX_CAR - (s1 - rent1) + 1):
                 if return1 == MAX_CAR - (s1 - rent1):
-                    p_return1 = poisson_sf(poisson_dict, return1 - 1, RETURN1)
+                    p_return1 = poisson_dict[return1 + RETURN1 * MAX_CAR * MAX_CAR]
                 else:
                     p_return1 = poisson_dict[return1 + RETURN1 * MAX_CAR]
                     
@@ -113,19 +92,18 @@ def init():
     for s2 in range(0, MAX_CAR + 1):
         for rent2 in range(0, s2 + 1):
             if rent2 == s2:
-                p_rent2 = poisson_sf(poisson_dict, rent2 - 1, RENT2)
+                p_rent2 = poisson_dict[rent2 + RENT2 * MAX_CAR * MAX_CAR]
             else:
                 p_rent2 = poisson_dict[rent2 + RENT2 * MAX_CAR]
 
             for return2 in range(0, MAX_CAR - (s2 - rent2) + 1):
                 if return2 == MAX_CAR - (s2 - rent2):
-                    p_return2 = poisson_sf(poisson_dict, return2 - 1, RETURN2)
+                    p_return2 = poisson_dict[return2 + RETURN2 * MAX_CAR * MAX_CAR]
                 else:
                     p_return2 = poisson_dict[return2 + RETURN2 * MAX_CAR]
             
                 p_2[s2, return2 - rent2 + s2] += p_rent2 * p_return2
     print(f"Initialization Done! Time: {time.time() - st:.1f}")
-    #print(f"{reward_rental}\n\n{p_1}\n\n{p_2}")
 
 
 def calculate_value(s1, s2, mv, v_old):
@@ -147,11 +125,10 @@ def policy_evaluation(v_old, policy):
         v_new = np.zeros((MAX_CAR + 1, MAX_CAR + 1))
         for s1 in range(0, MAX_CAR + 1):
             for s2 in range(0, MAX_CAR + 1):
-                mv = policy[s1, s2]     # number of cars moved from 1 to 2
+                mv = policy[s1, s2]
                 value_new = calculate_value(s1, s2, mv, v_old)
                 v_new[s1, s2] = value_new
                 delta = max(delta, abs(value_new - v_old[s1, s2]))
-        #print(f"PE {iter:2d} delta: {delta:6.3f} time: {time.time() - st:.1f}")
         if delta < THETA:
             break
         else:
