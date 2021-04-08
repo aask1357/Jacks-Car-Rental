@@ -19,7 +19,7 @@ Solving Reinforcement Learning - Policy Iteration Problem with Python
 * returned_2 = min(return_requests_2, MAX_CAR - (s2 + mv - rented_2))
 
 # Implementation Details
-![](https://github.com/aask1357/Jacks-Car-Rental/blob/main/implementation.jpg)
+![](https://github.com/aask1357/Jacks-Car-Rental/blob/main/Implementation.jpg)
 
 # Results
 ![](https://github.com/aask1357/Jacks-Car-Rental/blob/main/policy_5.png) ![](https://github.com/aask1357/Jacks-Car-Rental/blob/main/value_5.png)
