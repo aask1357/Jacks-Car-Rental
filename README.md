@@ -3,7 +3,7 @@ Solving Reinforcement Learning - Policy Iteration Problem with Python
 
 # Problem Details
 * Order: move(action) -> rent -> return
-* (s1, s2) = Number of cars at the location 1 and 2<br>
+* (s1, s2) = Number of cars at the location 1 and 2<br><br>
 
 * mv = Number of cars moved from 1 to 2
 * -MAX_MOVE <= mv <= MAX_MOVE
@@ -19,7 +19,7 @@ Solving Reinforcement Learning - Policy Iteration Problem with Python
 * returned_2 = min(return_requests_2, MAX_CAR - (s2 + mv - rented_2))
 
 # Implementation Details
-![implementation.jpg]
+![](https://github.com/aask1357/Jacks-Car-Rental/implementation.jpg)
 
 # Results
-![policy_5.png] ![value_5.png]
+![](https://github.com/aask1357/Jacks-Car-Rental/policy_5.jpg) ![](https://github.com/aask1357/Jacks-Car-Rental/value_5.png)
