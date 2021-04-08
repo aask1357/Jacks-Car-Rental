@@ -1,6 +1,12 @@
 # Jacks-Car-Rental
 Solving Reinforcement Learning - Policy Iteration Problem with Python
 
+# Requirements
+* Python >= 3.6
+* matplotlib
+* scipy
+* numpy
+
 # Problem Details
 * Order: move(action) -> rent -> return
 * (s1, s2) = Number of cars at the location 1 and 2<br><br>
