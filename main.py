@@ -153,7 +153,6 @@ def policy_improvement(value):
 
 
 if __name__ == '__main__':
-    np.set_printoptions(precision=3, suppress=True, linewidth=150)
     # initialize
     value = np.zeros((MAX_CAR + 1, MAX_CAR + 1))
     policy = np.zeros((MAX_CAR + 1, MAX_CAR + 1), dtype=np.intc)
