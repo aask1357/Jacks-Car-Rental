@@ -1,6 +1,9 @@
 # Jacks-Car-Rental
 Solving Reinforcement Learning - Policy Iteration Problem with Python
 
+# Speed
+Takes 13.4 sec for MAX_CAR = 20 to converge on Ryzen 2700x
+
 # Requirements
 * Python >= 3.6
 * matplotlib
